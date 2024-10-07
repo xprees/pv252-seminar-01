@@ -72,21 +72,41 @@ export class LazyList<T> extends HTMLElement {
       this.shadowRoot.querySelector<HTMLElement>("#spacer-bottom")!;
     this.#listElement = this.shadowRoot.querySelector<HTMLElement>("#list")!;
 
-    this.#listElement.onscroll = () => {
-      console.log(this.#listElement.scrollTop);
-    };
-
-    // Remove this once you are actually showing some data in the list.
-    this.innerHTML = "<span> Some content </span>"
+    this.#listElement.onscroll = () =>
+      this.onScrollPositionChanged(this.#listElement.scrollTop);
   }
 
   setData(data: T[]) {
     this.#data = data;
-    // TODO: Data changed, re-draw content.
+    this.reRenderData(data);
   }
 
   setRenderer(renderer: Renderer<T>) {
     this.#renderFunction = renderer;
-    // TODO: Renderer changed, re-draw content.
+    this.reRenderData(this.#data);
+  }
+
+  private reRenderData(data: T[]) {
+    // Render the items that are visible
+    for (const item of data.slice(this.#visiblePosition, 1)) {
+      const renderedItem = this.#renderFunction(item);
+      this.appendChild(renderedItem);
+    }
+    // TODO Implement
+
+    // Update the visible position.
+  }
+
+  private onScrollPositionChanged(topOffset: number) {
+    this.#topOffsetElement.style.height = `${topOffset}}px`;
+
+    console.log(topOffset);
+    // TODO Implement
+    // Calculate the height of the spacer-top.
+    // Calculate the height of the spacer-bottom.
+
+    // TODO update visible items
+
+    this.#listElement.scrollTop = topOffset;
   }
 }
